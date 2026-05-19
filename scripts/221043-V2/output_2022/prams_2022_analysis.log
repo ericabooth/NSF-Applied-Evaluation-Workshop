@@ -1,0 +1,998 @@
+----------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/ericbooth/Documents/PVAMU_NSF_Workshop_2026/scripts/221043-V2/output_2022/
+> prams_2022_analysis.log
+  log type:  text
+ opened on:  15 May 2026, 18:47:16
+
+. 
+. * Install user-written commands if not already present
+. cap which estout
+
+. if _rc ssc install estout, replace
+
+. cap which coefplot
+
+. if _rc ssc install coefplot, replace
+
+. 
+. /*====================================================================
+>   SECTION 1 — IMPORT & STACK INTO MASTER DATASET
+>   Strategy: import each indicator block separately, keep only
+>   state (col A) and Weighted % (col D), then merge on state name.
+>   We import cols A:F for dep_before to capture 95% CIs for the
+>   caterpillar plot; all other variables use cols A:D only.
+> ====================================================================*/
+. 
+. * ── 1a. Pre-pregnancy depression (Depression sheet, rows 4–36) ────────────
+. import excel using "$data/$fname", ///
+>     sheet("Depression") cellrange(A4:F36) clear
+(6 vars, 33 obs)
+
+. 
+. rename (A B C D E F) (state N_unwt n_unwt dep_before dep_before_lo dep_before_hi)
+
+. drop N_unwt n_unwt
+
+. drop if state == "Sites aggregated*"
+(1 observation deleted)
+
+. foreach v of varlist dep_before dep_before_lo dep_before_hi {
+  2.     destring `v', replace force
+  3. }
+dep_before already numeric; no replace
+dep_before_lo already numeric; no replace
+dep_before_hi already numeric; no replace
+
+. save "$out/prams22_master.dta", replace
+(file
+    /Users/ericbooth/Documents/PVAMU_NSF_Workshop_2026/scripts/221043-V2/output_2022/prams22
+    > _master.dta not found)
+file
+    /Users/ericbooth/Documents/PVAMU_NSF_Workshop_2026/scripts/221043-V2/output_2022/prams22
+    > _master.dta saved
+
+. 
+. * ── 1b. Depression during pregnancy (Depression sheet, rows 39–71) ─────────
+. import excel using "$data/$fname", ///
+>     sheet("Depression") cellrange(A39:D71) clear
+(4 vars, 33 obs)
+
+. 
+. rename (A D) (state dep_during)
+
+. drop B C
+
+. drop if state == "Sites aggregated*"
+(1 observation deleted)
+
+. destring dep_during, replace force
+dep_during already numeric; no replace
+
+. merge 1:1 state using "$out/prams22_master.dta", nogen
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                             0
+    Matched                                32  
+    -----------------------------------------
+
+. save "$out/prams22_master.dta", replace
+file
+    /Users/ericbooth/Documents/PVAMU_NSF_Workshop_2026/scripts/221043-V2/output_2022/prams22
+    > _master.dta saved
+
+. 
+. * ── 1c. Postpartum depressive symptoms (Depression sheet, rows 74–106) ─────
+. import excel using "$data/$fname", ///
+>     sheet("Depression") cellrange(A74:D106) clear
+(4 vars, 33 obs)
+
+. 
+. rename (A D) (state dep_postpartum)
+
+. drop B C
+
+. drop if state == "Sites aggregated*"
+(1 observation deleted)
+
+. destring dep_postpartum, replace force
+dep_postpartum already numeric; no replace
+
+. merge 1:1 state using "$out/prams22_master.dta", nogen
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                             0
+    Matched                                32  
+    -----------------------------------------
+
+. save "$out/prams22_master.dta", replace
+file
+    /Users/ericbooth/Documents/PVAMU_NSF_Workshop_2026/scripts/221043-V2/output_2022/prams22
+    > _master.dta saved
+
+. 
+. * ── 1d. Cigarette smoking before pregnancy (Substance Use, rows 4–36) ───────
+. import excel using "$data/$fname", ///
+>     sheet("Substance Use") cellrange(A4:D36) clear
+(4 vars, 33 obs)
+
+. 
+. rename (A D) (state smoke_before)
+
+. drop B C
+
+. drop if state == "Sites aggregated*"
+(1 observation deleted)
+
+. destring smoke_before, replace force
+smoke_before already numeric; no replace
+
+. merge 1:1 state using "$out/prams22_master.dta", nogen
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                             0
+    Matched                                32  
+    -----------------------------------------
+
+. save "$out/prams22_master.dta", replace
+file
+    /Users/ericbooth/Documents/PVAMU_NSF_Workshop_2026/scripts/221043-V2/output_2022/prams22
+    > _master.dta saved
+
+. 
+. * ── 1e. Prenatal care in 1st trimester (Health Care Services, rows 39–71) ───
+. import excel using "$data/$fname", ///
+>     sheet("Health Care Services") cellrange(A39:D71) clear
+(4 vars, 33 obs)
+
+. 
+. rename (A D) (state prenatal_1strim)
+
+. drop B C
+
+. drop if state == "Sites aggregated*"
+(1 observation deleted)
+
+. destring prenatal_1strim, replace force
+prenatal_1strim already numeric; no replace
+
+. merge 1:1 state using "$out/prams22_master.dta", nogen
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                             0
+    Matched                                32  
+    -----------------------------------------
+
+. save "$out/prams22_master.dta", replace
+file
+    /Users/ericbooth/Documents/PVAMU_NSF_Workshop_2026/scripts/221043-V2/output_2022/prams22
+    > _master.dta saved
+
+. 
+. * ── 1f. Private insurance before pregnancy (Health Ins. Before, rows 4–36) ──
+. import excel using "$data/$fname", ///
+>     sheet("Health Ins. Status Before Preg.") cellrange(A4:D36) clear
+(4 vars, 33 obs)
+
+. 
+. rename (A D) (state ins_private_before)
+
+. drop B C
+
+. drop if state == "Sites aggregated*"
+(1 observation deleted)
+
+. destring ins_private_before, replace force
+ins_private_before already numeric; no replace
+
+. merge 1:1 state using "$out/prams22_master.dta", nogen
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                             0
+    Matched                                32  
+    -----------------------------------------
+
+. save "$out/prams22_master.dta", replace
+file
+    /Users/ericbooth/Documents/PVAMU_NSF_Workshop_2026/scripts/221043-V2/output_2022/prams22
+    > _master.dta saved
+
+. 
+. * ── 1g. Medicaid/CHIP before pregnancy (Health Ins. Before, rows 39–71) ─────
+. import excel using "$data/$fname", ///
+>     sheet("Health Ins. Status Before Preg.") cellrange(A39:D71) clear
+(4 vars, 33 obs)
+
+. 
+. rename (A D) (state ins_medicaid_before)
+
+. drop B C
+
+. drop if state == "Sites aggregated*"
+(1 observation deleted)
+
+. destring ins_medicaid_before, replace force
+ins_medicaid_before already numeric; no replace
+
+. merge 1:1 state using "$out/prams22_master.dta", nogen
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                             0
+    Matched                                32  
+    -----------------------------------------
+
+. save "$out/prams22_master.dta", replace
+file
+    /Users/ericbooth/Documents/PVAMU_NSF_Workshop_2026/scripts/221043-V2/output_2022/prams22
+    > _master.dta saved
+
+. 
+. * ── 1h. No insurance before pregnancy (Health Ins. Before, rows 74–106) ─────
+. import excel using "$data/$fname", ///
+>     sheet("Health Ins. Status Before Preg.") cellrange(A74:D106) clear
+(4 vars, 33 obs)
+
+. 
+. rename (A D) (state ins_none_before)
+
+. drop B C
+
+. drop if state == "Sites aggregated*"
+(1 observation deleted)
+
+. destring ins_none_before, replace force
+ins_none_before already numeric; no replace
+
+. merge 1:1 state using "$out/prams22_master.dta", nogen
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                             0
+    Matched                                32  
+    -----------------------------------------
+
+. save "$out/prams22_master.dta", replace
+file
+    /Users/ericbooth/Documents/PVAMU_NSF_Workshop_2026/scripts/221043-V2/output_2022/prams22
+    > _master.dta saved
+
+. 
+. * ── 1i. Ever breastfed (Breastfeeding Practices, rows 4–36) ─────────────────
+. import excel using "$data/$fname", ///
+>     sheet("Breastfeeding Practices") cellrange(A4:D36) clear
+(4 vars, 33 obs)
+
+. 
+. rename (A D) (state bf_ever)
+
+. drop B C
+
+. drop if state == "Sites aggregated*"
+(1 observation deleted)
+
+. destring bf_ever, replace force
+bf_ever already numeric; no replace
+
+. merge 1:1 state using "$out/prams22_master.dta", nogen
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                             0
+    Matched                                32  
+    -----------------------------------------
+
+. save "$out/prams22_master.dta", replace
+file
+    /Users/ericbooth/Documents/PVAMU_NSF_Workshop_2026/scripts/221043-V2/output_2022/prams22
+    > _master.dta saved
+
+. 
+. /*====================================================================
+>   SECTION 2 — CLEAN, LABEL & ENRICH MASTER DATASET
+> ====================================================================*/
+. 
+. use "$out/prams22_master.dta", clear
+
+. 
+. * ── 2a. State abbreviation crosswalk ────────────────────────────────────────
+. gen state_abbr = ""
+(32 missing values generated)
+
+. replace state_abbr = "AL"  if state == "Alabama"
+variable state_abbr was str1 now str2
+(1 real change made)
+
+. replace state_abbr = "AZ"  if state == "Arizona"
+(1 real change made)
+
+. replace state_abbr = "CO"  if state == "Colorado"
+(1 real change made)
+
+. replace state_abbr = "CT"  if state == "Connecticut"
+(1 real change made)
+
+. replace state_abbr = "DE"  if state == "Delaware"
+(1 real change made)
+
+. replace state_abbr = "DC"  if state == "District of Columbia"
+(1 real change made)
+
+. replace state_abbr = "HI"  if state == "Hawaii"
+(1 real change made)
+
+. replace state_abbr = "KS"  if state == "Kansas"
+(1 real change made)
+
+. replace state_abbr = "KY"  if state == "Kentucky"
+(1 real change made)
+
+. replace state_abbr = "ME"  if state == "Maine"
+(1 real change made)
+
+. replace state_abbr = "MA"  if state == "Massachusetts"
+(1 real change made)
+
+. replace state_abbr = "MI"  if state == "Michigan"
+(1 real change made)
+
+. replace state_abbr = "MO"  if state == "Missouri"
+(1 real change made)
+
+. replace state_abbr = "MT"  if state == "Montana"
+(1 real change made)
+
+. replace state_abbr = "NE"  if state == "Nebraska"
+(1 real change made)
+
+. replace state_abbr = "NJ"  if state == "New Jersey"
+(1 real change made)
+
+. replace state_abbr = "NM"  if state == "New Mexico"
+(1 real change made)
+
+. replace state_abbr = "NYC" if state == "New York City"
+variable state_abbr was str2 now str3
+(1 real change made)
+
+. replace state_abbr = "NY"  if state == "New York State"
+(1 real change made)
+
+. replace state_abbr = "ND"  if state == "North Dakota"
+(1 real change made)
+
+. replace state_abbr = "NMI" if state == "Northern Mariana Islands"
+(1 real change made)
+
+. replace state_abbr = "OK"  if state == "Oklahoma"
+(1 real change made)
+
+. replace state_abbr = "PA"  if state == "Pennsylvania"
+(1 real change made)
+
+. replace state_abbr = "PR"  if state == "Puerto Rico"
+(1 real change made)
+
+. replace state_abbr = "RI"  if state == "Rhode Island"
+(1 real change made)
+
+. replace state_abbr = "SD"  if state == "South Dakota"
+(1 real change made)
+
+. replace state_abbr = "UT"  if state == "Utah"
+(1 real change made)
+
+. replace state_abbr = "VT"  if state == "Vermont"
+(1 real change made)
+
+. replace state_abbr = "VA"  if state == "Virginia"
+(1 real change made)
+
+. replace state_abbr = "WA"  if state == "Washington"
+(1 real change made)
+
+. replace state_abbr = "WI"  if state == "Wisconsin"
+(1 real change made)
+
+. replace state_abbr = "WY"  if state == "Wyoming"
+(1 real change made)
+
+. 
+. * ── 2b. Region grouping (Census Bureau divisions) ───────────────────────────
+. gen region = .
+(32 missing values generated)
+
+. label define regionlbl 1 "Northeast" 2 "Midwest" 3 "South" 4 "West" 5 "Territory"
+
+. label values region regionlbl
+
+. 
+. replace region = 1 if inlist(state_abbr, "CT","ME","MA","NJ","NY","NYC","PA","RI","VT")
+(9 real changes made)
+
+. replace region = 2 if inlist(state_abbr, "KS","MI","MO","NE","ND","SD","WI")
+(7 real changes made)
+
+. replace region = 3 if inlist(state_abbr, "AL","DE","DC","KY","OK","VA","WV")
+(6 real changes made)
+
+. replace region = 4 if inlist(state_abbr, "AZ","CO","HI","MT","NM","UT","WA","WY")
+(8 real changes made)
+
+. replace region = 5 if inlist(state_abbr, "NMI","PR")
+(2 real changes made)
+
+. 
+. * ── 2c. Variable labels ──────────────────────────────────────────────────────
+. label var state              "State/Jurisdiction Name"
+
+. label var state_abbr         "State Abbreviation"
+
+. label var dep_before         "Pre-pregnancy depression, % (weighted)"
+
+. label var dep_before_lo      "Pre-pregnancy depression, lower 95% CI"
+
+. label var dep_before_hi      "Pre-pregnancy depression, upper 95% CI"
+
+. label var dep_during         "Depression during pregnancy, % (weighted)"
+
+. label var dep_postpartum     "Postpartum depressive symptoms, % (weighted)"
+
+. label var smoke_before       "Cigarette smoking before pregnancy, % (weighted)"
+
+. label var prenatal_1strim    "Prenatal care began in 1st trimester, % (weighted)"
+
+. label var ins_private_before "Private insurance before pregnancy, % (weighted)"
+
+. label var ins_medicaid_before "Medicaid/CHIP before pregnancy, % (weighted)"
+
+. label var ins_none_before    "No insurance before pregnancy, % (weighted)"
+
+. label var bf_ever            "Ever breastfed, % (weighted)"
+
+. 
+. * ── 2d. Quick data check ─────────────────────────────────────────────────────
+. assert _N == 32
+
+. list state state_abbr if missing(state_abbr)   // should return empty
+
+. 
+. sort state
+
+. gen state_id = _n
+
+. 
+. save "$out/prams22_master.dta", replace
+file
+    /Users/ericbooth/Documents/PVAMU_NSF_Workshop_2026/scripts/221043-V2/output_2022/prams22
+    > _master.dta saved
+
+. 
+. /*====================================================================
+>   SECTION 3 — DESCRIPTIVE STATISTICS
+> 
+>   Research Question:
+>     Do state-level rates of being uninsured before pregnancy predict
+>     pre-pregnancy depression rates among postpartum women surveyed
+>     by PRAMS in 2022?
+> ====================================================================*/
+. 
+. use "$out/prams22_master.dta", clear
+
+. 
+. di as text _n "══════════════════════════════════════════════════════"
+
+══════════════════════════════════════════════════════
+
+. di as text    " Table 1. Summary Statistics — PRAMS 2022 (N=32)"
+ Table 1. Summary Statistics — PRAMS 2022 (N=32)
+
+. di as text    "══════════════════════════════════════════════════════"
+══════════════════════════════════════════════════════
+
+. 
+. tabstat dep_before dep_during dep_postpartum          ///
+>         ins_none_before ins_medicaid_before            ///
+>         ins_private_before smoke_before prenatal_1strim ///
+>         bf_ever,                                       ///
+>     stats(n mean sd min p25 p50 p75 max) col(stats)   ///
+>     format(%6.1f) varwidth(28)
+
+                    Variable |         N      Mean        SD       Min       p25       p50
+-----------------------------+------------------------------------------------------------
+                  dep_before |      32.0      17.5       5.7       6.0      14.9      18.2
+                  dep_during |      32.0      17.4       4.7       6.3      16.2      18.2
+              dep_postpartum |      32.0      13.0       3.0       8.0      11.2      12.4
+             ins_none_before |      32.0      10.0       4.4       3.1       6.9       9.9
+         ins_medicaid_before |      32.0      27.5      11.4      10.9      20.2      26.1
+          ins_private_before |      32.0      62.0      10.4      33.5      57.0      64.0
+                smoke_before |      32.0      10.6       4.3       3.8       6.8      11.3
+             prenatal_1strim |      32.0      88.1       4.0      75.4      86.5      88.0
+                     bf_ever |      32.0      91.8       3.2      81.8      90.3      91.7
+------------------------------------------------------------------------------------------
+
+                    Variable |       p75       Max
+-----------------------------+--------------------
+                  dep_before |      21.6      26.4
+                  dep_during |      20.9      25.0
+              dep_postpartum |      14.5      23.2
+             ins_none_before |      12.1      22.7
+         ins_medicaid_before |      30.9      61.2
+          ins_private_before |      69.5      79.8
+                smoke_before |      13.7      18.7
+             prenatal_1strim |      90.4      93.9
+                     bf_ever |      93.7      97.9
+--------------------------------------------------
+
+. 
+. di as text _n "── Detailed: Outcome & Main Predictor ──────────────────"
+
+── Detailed: Outcome & Main Predictor ──────────────────
+
+. sum dep_before ins_none_before, detail
+
+           Pre-pregnancy depression, % (weighted)
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%            6              6
+ 5%          6.2            6.2
+10%          9.1              7       Obs                  32
+25%         14.9            9.1       Sum of wgt.          32
+
+50%        18.25                      Mean           17.50313
+                        Largest       Std. dev.      5.660416
+75%        21.55           24.3
+90%         24.3           24.5       Variance       32.04031
+95%         25.3           25.3       Skewness      -.5789592
+99%         26.4           26.4       Kurtosis       2.468358
+
+         No insurance before pregnancy, % (weighted)
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%          3.1            3.1
+ 5%          3.1            3.1
+10%            5            3.6       Obs                  32
+25%          6.9              5       Sum of wgt.          32
+
+50%          9.9                      Mean           10.04375
+                        Largest       Std. dev.      4.427257
+75%        12.15           14.5
+90%         14.5           16.4       Variance        19.6006
+95%         18.5           18.5       Skewness        .649513
+99%         22.7           22.7       Kurtosis       3.645451
+
+. 
+. * ── 3b. Top/bottom five by depression ───────────────────────────────────────
+. di as text _n "── States with highest pre-pregnancy depression ─────────"
+
+── States with highest pre-pregnancy depression ─────────
+
+. gsort -dep_before
+
+. list state_abbr dep_before dep_before_lo dep_before_hi ///
+>     ins_none_before in 1/5, clean noobs abbrev(12)
+
+    state_abbr   dep_before   dep_before~o   dep_before~i   ins_none_b~e  
+            WY         26.4           21.6           31.8           13.6  
+            MO         25.3           22.1           28.7           16.4  
+            UT         24.5           21.7           27.5            9.3  
+            KY         24.3           20.5           28.5           10.2  
+            VT         23.5           20.7           26.6            5.1  
+
+. 
+. di as text _n "── States with lowest pre-pregnancy depression ──────────"
+
+── States with lowest pre-pregnancy depression ──────────
+
+. gsort +dep_before
+
+. list state_abbr dep_before dep_before_lo dep_before_hi ///
+>     ins_none_before in 1/5, clean noobs abbrev(12)
+
+    state_abbr   dep_before   dep_before~o   dep_before~i   ins_none_b~e  
+           NYC            6            4.6            7.6            7.9  
+            PR          6.2            4.7            8.2            3.1  
+            NJ            7            5.4              9           14.5  
+           NMI          9.1            6.6           12.4            8.4  
+            HI          9.5            7.5           11.9            3.6  
+
+. 
+. * ── 3c. Correlation matrix ───────────────────────────────────────────────────
+. di as text _n "── Correlations among key variables ─────────────────────"
+
+── Correlations among key variables ─────────────────────
+
+. pwcorr dep_before ins_none_before ins_medicaid_before ///
+>        smoke_before prenatal_1strim, sig star(0.10)
+
+             | dep_be~e ins_no~e ins_me~e smoke_~e prenat~m
+-------------+---------------------------------------------
+  dep_before |   1.0000 
+             |
+             |
+ins_none_b~e |   0.2694   1.0000 
+             |   0.1360
+             |
+ins_medica~e |  -0.5197* -0.4364*  1.0000 
+             |   0.0023   0.0125
+             |
+smoke_before |   0.7181*  0.3285* -0.1244   1.0000 
+             |   0.0000   0.0664   0.4976
+             |
+prenatal_1~m |   0.3046* -0.2427  -0.3240* -0.0452   1.0000 
+             |   0.0901   0.1807   0.0705   0.8058
+             |
+
+. 
+. /*====================================================================
+>   SECTION 4 — VISUALIZATION
+> ====================================================================*/
+. 
+. * shared graph scheme
+. set scheme s1color
+
+. 
+. * ── 4a. Sorted horizontal bar chart — dep_before by state ────────────────────
+. graph hbar (asis) dep_before,                                             ///
+>     over(state_abbr, sort(dep_before) descending                          ///
+>         label(labsize(vsmall) angle(0)))                                  ///
+>     ytitle("Pre-Pregnancy Depression (%, weighted)")                      ///
+>     title("Pre-Pregnancy Depression by State/Jurisdiction"                ///
+>           "PRAMS 2022", size(medsmall))                                   ///
+>     note("Source: CDC PRAMS MCH Indicators 2022. N=32 jurisdictions."     ///
+>          "Dashed line = sites-aggregated estimate (17.1%).", span)        ///
+>     bar(1, fcolor(navy%70) lcolor(navy%0))                                ///
+>     yline(17.1, lpattern(dash) lcolor(cranberry) lwidth(medthin))         ///
+>     plotregion(fcolor(white)) graphregion(fcolor(white))
+
+. 
+. graph export "$out/fig1_dep_bar.png", replace width(1400)
+file
+    /Users/ericbooth/Documents/PVAMU_NSF_Workshop_2026/scripts/221043-V2/output_2022/fig1_de
+    > p_bar.png saved as PNG format
+
+. 
+. * ── 4b. Caterpillar / forest plot — dep_before with 95% CIs ─────────────────
+. gsort -dep_before
+
+. gen rank = _n
+
+. gen rank_lbl = state_abbr    // for labeling the y-axis
+
+. 
+. twoway                                                                    ///
+>     (rcap dep_before_lo dep_before_hi rank, horizontal                    ///
+>         lcolor(gs12) lwidth(thin))                                        ///
+>     (scatter rank dep_before,                                             ///
+>         msymbol(circle) msize(small) mcolor(navy)                         ///
+>         mlabel(rank_lbl) mlabsize(vsmall) mlabpos(9)                      ///
+>         mlabcolor(gs4) mlabgap(1)),                                       ///
+>     ylabel(none)                                                          ///
+>     xtitle("Pre-Pregnancy Depression Rate (%), 95% CI")                   ///
+>     ytitle("")                                                            ///
+>     title("Pre-Pregnancy Depression with 95% Confidence Intervals"        ///
+>           "PRAMS 2022, Sorted by Estimate", size(medsmall))               ///
+>     xline(17.1, lpattern(dash) lcolor(cranberry) lwidth(medthin))         ///
+>     note("Dashed line = sites-aggregated estimate (17.1%)."               ///
+>          "Source: CDC PRAMS MCH Indicators 2022. N=32.", span)            ///
+>     legend(off)                                                           ///
+>     plotregion(fcolor(white)) graphregion(fcolor(white))
+
+. 
+. graph export "$out/fig2_dep_forest.png", replace width(1100) height(900)
+file
+    /Users/ericbooth/Documents/PVAMU_NSF_Workshop_2026/scripts/221043-V2/output_2022/fig2_de
+    > p_forest.png saved as PNG format
+
+. drop rank rank_lbl
+
+. 
+. * ── 4c. Scatter: dep_before vs ins_none_before (key relationship) ────────────
+. twoway                                                                    ///
+>     (scatter dep_before ins_none_before,                                  ///
+>         msymbol(circle) msize(medsmall) mcolor(navy%65)                   ///
+>         mlabel(state_abbr) mlabsize(tiny) mlabpos(12)                     ///
+>         mlabcolor(gs5) mlabgap(1))                                        ///
+>     (lfit dep_before ins_none_before,                                     ///
+>         lcolor(cranberry) lwidth(medthin) lpattern(solid)),               ///
+>     xtitle("% Uninsured One Month Before Pregnancy (weighted)")           ///
+>     ytitle("% Pre-Pregnancy Depression (weighted)")                       ///
+>     title("Pre-Pregnancy Depression vs. Pre-Pregnancy Uninsurance"        ///
+>           "PRAMS 2022 — State/Jurisdiction Level", size(medsmall))        ///
+>     legend(order(1 "State estimate" 2 "OLS fit line")                     ///
+>            position(5) ring(0) size(small) cols(1))                       ///
+>     note("Source: CDC PRAMS MCH Indicators 2022. N=32.", span)            ///
+>     plotregion(fcolor(white)) graphregion(fcolor(white))
+
+. 
+. graph export "$out/fig3_scatter_dep_ins.png", replace width(1200)
+file
+    /Users/ericbooth/Documents/PVAMU_NSF_Workshop_2026/scripts/221043-V2/output_2022/fig3_sc
+    > atter_dep_ins.png saved as PNG format
+
+. 
+. * ── 4d. Scatter matrix — overview of main analytic variables ─────────────────
+. graph matrix dep_before ins_none_before smoke_before ins_medicaid_before, ///
+>     half                                                                  ///
+>     msymbol(circle) msize(vsmall) mcolor(navy%50)                        ///
+>     title("Correlation Matrix: Key PRAMS Indicators"                      ///
+>           "State/Jurisdiction Level, 2022", size(medsmall))               ///
+>     note("Source: CDC PRAMS MCH Indicators 2022. N=32.", span)            ///
+>     plotregion(fcolor(white)) graphregion(fcolor(white))
+
+. 
+. graph export "$out/fig4_matrix.png", replace width(1200)
+file
+    /Users/ericbooth/Documents/PVAMU_NSF_Workshop_2026/scripts/221043-V2/output_2022/fig4_ma
+    > trix.png saved as PNG format
+
+. 
+. /*====================================================================
+>   SECTION 5 — REGRESSION ANALYSIS
+> 
+>   Outcome:  dep_before — % pre-pregnancy depression (weighted)
+>   Unit:     State/jurisdiction (N = 32; ecological regression)
+> 
+>   Model progression:
+>     M1  Bivariate — dep_before ~ ins_none_before
+>     M2  Adjusted  — + smoke_before (SES/behavioral proxy)
+>     M3  Full      — + ins_medicaid_before (public insurance share)
+> 
+>   Note: With N=32 we keep the model parsimonious. Each β₁ is
+>   interpreted as: "A 1 pp increase in the uninsured share before
+>   pregnancy is associated with a β₁ pp change in depression rates."
+> ====================================================================*/
+. 
+. * ── 5a. Model 1: bivariate ───────────────────────────────────────────────────
+. regress dep_before ins_none_before
+
+      Source |       SS           df       MS      Number of obs   =        32
+-------------+----------------------------------   F(1, 30)        =      2.35
+       Model |   72.085453         1   72.085453   Prob > F        =    0.1360
+    Residual |  921.164235        30  30.7054745   R-squared       =    0.0726
+-------------+----------------------------------   Adj R-squared   =    0.0417
+       Total |  993.249687        31  32.0403125   Root MSE        =    5.5413
+
+---------------------------------------------------------------------------------
+     dep_before | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+----------------+----------------------------------------------------------------
+ins_none_before |   .3444358   .2247979     1.53   0.136    -.1146629    .8035344
+          _cons |    14.0437   2.461152     5.71   0.000     9.017354    19.07004
+---------------------------------------------------------------------------------
+
+. estimates store m1
+
+. 
+. * ── 5b. Model 2: + smoking ───────────────────────────────────────────────────
+. regress dep_before ins_none_before smoke_before
+
+      Source |       SS           df       MS      Number of obs   =        32
+-------------+----------------------------------   F(2, 29)        =     15.52
+       Model |   513.44582         2   256.72291   Prob > F        =    0.0000
+    Residual |  479.803867        29  16.5449609   R-squared       =    0.5169
+-------------+----------------------------------   Adj R-squared   =    0.4836
+       Total |  993.249687        31  32.0403125   Root MSE        =    4.0675
+
+---------------------------------------------------------------------------------
+     dep_before | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+----------------+----------------------------------------------------------------
+ins_none_before |   .0479878   .1747098     0.27   0.786    -.3093339    .4053096
+   smoke_before |   .9265094    .179385     5.16   0.000     .5596259    1.293393
+          _cons |   7.223311   2.237767     3.23   0.003     2.646563    11.80006
+---------------------------------------------------------------------------------
+
+. estimates store m2
+
+. 
+. * ── 5c. Model 3: + Medicaid share ────────────────────────────────────────────
+. regress dep_before ins_none_before smoke_before ins_medicaid_before
+
+      Source |       SS           df       MS      Number of obs   =        32
+-------------+----------------------------------   F(3, 28)        =     25.28
+       Model |   725.44397         3  241.814657   Prob > F        =    0.0000
+    Residual |  267.805717        28  9.56448989   R-squared       =    0.7304
+-------------+----------------------------------   Adj R-squared   =    0.7015
+       Total |  993.249687        31  32.0403125   Root MSE        =    3.0927
+
+-------------------------------------------------------------------------------------
+         dep_before | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+--------------------+----------------------------------------------------------------
+    ins_none_before |    -.24318   .1465273    -1.66   0.108    -.5433275    .0569675
+       smoke_before |   .9408599   .1364245     6.90   0.000     .6614069    1.220313
+ins_medicaid_before |  -.2558154   .0543365    -4.71   0.000    -.3671187   -.1445122
+              _cons |   17.04049   2.691279     6.33   0.000     11.52765    22.55332
+-------------------------------------------------------------------------------------
+
+. estimates store m3
+
+. 
+. * ── 5d. Side-by-side regression table ────────────────────────────────────────
+. esttab m1 m2 m3,                                                          ///
+>     label b(%7.3f) se(%7.3f)                                              ///
+>     star(* 0.10 ** 0.05 *** 0.01)                                         ///
+>     stats(N r2 r2_a aic, fmt(%4.0f %6.3f %6.3f %6.1f)                    ///
+>           labels("N" "R²" "Adj. R²" "AIC"))                               ///
+>     title("Table 2. OLS Regression: Pre-Pregnancy Depression Rate (2022)") ///
+>     mtitles("Bivariate" "Adjusted" "Full")                                ///
+>     nonotes                                                               ///
+>     addnote("Unit of analysis: state/jurisdiction (N=32). Ecological regression." ///
+>             "All variables are weighted prevalence estimates (%)."         ///
+>             "Standard errors in parentheses. * p<.10  ** p<.05  *** p<.01")
+
+Table 2. OLS Regression: Pre-Pregnancy Depression Rate (2022)
+--------------------------------------------------------------------
+                              (1)             (2)             (3)   
+                        Bivariate        Adjusted            Full   
+--------------------------------------------------------------------
+No insurance befor~%        0.344           0.048          -0.243   
+                          (0.225)         (0.175)         (0.147)   
+
+Cigarette smoking ~n                        0.927***        0.941***
+                                          (0.179)         (0.136)   
+
+Medicaid/CHIP befo~                                        -0.256***
+                                                          (0.054)   
+
+Constant                   14.044***        7.223***       17.040***
+                          (2.461)         (2.238)         (2.691)   
+--------------------------------------------------------------------
+N                              32              32              32   
+R²                          0.073           0.517           0.730   
+Adj. R²                     0.042           0.484           0.701   
+AIC                         202.3           183.5           166.8   
+--------------------------------------------------------------------
+Unit of analysis: state/jurisdiction (N=32). Ecological regression.
+All variables are weighted prevalence estimates (%).
+Standard errors in parentheses. * p<.10  ** p<.05  *** p<.01
+
+. 
+. * ── 5e. Coefficient plot — all three models ──────────────────────────────────
+. coefplot m1 m2 m3,                                                        ///
+>     drop(_cons)                                                           ///
+>     xline(0, lpattern(dash) lcolor(gs10))                                 ///
+>     title("Coefficient Estimates: Pre-Pregnancy Depression"               ///
+>           "PRAMS 2022 — State-Level OLS", size(medsmall))                 ///
+>     legend(order(2 "Model 1: Bivariate"                                   ///
+>                  4 "Model 2: Adjusted"                                    ///
+>                  6 "Model 3: Full")                                       ///
+>            position(4) ring(0) size(small) cols(1))                       ///
+>     plotregion(fcolor(white)) graphregion(fcolor(white))
+
+. 
+. graph export "$out/fig5_coefplot.png", replace width(1200)
+file
+    /Users/ericbooth/Documents/PVAMU_NSF_Workshop_2026/scripts/221043-V2/output_2022/fig5_co
+    > efplot.png saved as PNG format
+
+. 
+. * ── 5f. Fitted vs. observed — Model 2 ────────────────────────────────────────
+. quietly regress dep_before ins_none_before smoke_before
+
+. predict dep_hat, xb
+
+. predict dep_resid, residuals
+
+. 
+. twoway                                                                    ///
+>     (scatter dep_before dep_hat,                                          ///
+>         msymbol(circle) msize(medsmall) mcolor(navy%65)                   ///
+>         mlabel(state_abbr) mlabsize(tiny) mlabpos(3) mlabgap(1)           ///
+>         mlabcolor(gs5))                                                   ///
+>     (function y=x, range(8 28) lcolor(cranberry) lpattern(dash)),        ///
+>     xtitle("Fitted Values (Model 2)")                                     ///
+>     ytitle("Observed Pre-Pregnancy Depression (%)")                       ///
+>     title("Fitted vs. Observed: Pre-Pregnancy Depression"                 ///
+>           "PRAMS 2022, OLS Model 2", size(medsmall))                      ///
+>     legend(off)                                                           ///
+>     note("Dashed line = 45° perfect-fit reference."                       ///
+>          "Source: CDC PRAMS MCH Indicators 2022. N=32.", span)            ///
+>     plotregion(fcolor(white)) graphregion(fcolor(white))
+
+. 
+. graph export "$out/fig6_fit_vs_obs.png", replace width(1200)
+file
+    /Users/ericbooth/Documents/PVAMU_NSF_Workshop_2026/scripts/221043-V2/output_2022/fig6_fi
+    > t_vs_obs.png saved as PNG format
+
+. 
+. * ── 5g. Residual plot ────────────────────────────────────────────────────────
+. twoway scatter dep_resid dep_hat,                                         ///
+>     msymbol(circle) msize(medsmall) mcolor(navy%65)                       ///
+>     mlabel(state_abbr) mlabsize(tiny) mlabpos(3) mlabgap(1)               ///
+>     mlabcolor(gs5)                                                        ///
+>     yline(0, lcolor(cranberry) lpattern(dash) lwidth(medthin))            ///
+>     xtitle("Fitted Values") ytitle("Residuals")                           ///
+>     title("Residuals vs. Fitted: OLS Model 2"                             ///
+>           "PRAMS 2022", size(medsmall))                                   ///
+>     note("Source: CDC PRAMS MCH Indicators 2022. N=32.", span)            ///
+>     plotregion(fcolor(white)) graphregion(fcolor(white))
+
+. 
+. graph export "$out/fig7_residuals.png", replace width(1200)
+file
+    /Users/ericbooth/Documents/PVAMU_NSF_Workshop_2026/scripts/221043-V2/output_2022/fig7_re
+    > siduals.png saved as PNG format
+
+. 
+. drop dep_hat dep_resid
+
+. 
+. /*====================================================================
+>   SECTION 6 — SAVE FINAL ANALYTIC DATASET
+> ====================================================================*/
+. 
+. order state state_abbr region                                             ///
+>       dep_before dep_before_lo dep_before_hi dep_during dep_postpartum   ///
+>       ins_none_before ins_private_before ins_medicaid_before              ///
+>       smoke_before prenatal_1strim bf_ever
+
+. 
+. sort state
+
+. save "$out/prams22_master.dta", replace
+file
+    /Users/ericbooth/Documents/PVAMU_NSF_Workshop_2026/scripts/221043-V2/output_2022/prams22
+    > _master.dta saved
+
+. export delimited "$out/prams22_master.csv", replace
+(file
+    /Users/ericbooth/Documents/PVAMU_NSF_Workshop_2026/scripts/221043-V2/output_2022/prams22
+    > _master.csv not found)
+file /Users/ericbooth/Documents/PVAMU_NSF_Workshop_2026/scripts/221043-V2/output_2022/prams22_
+> master.csv saved
+
+. 
+. di as text _n "══════════════════════════════════════════════════════════"
+
+══════════════════════════════════════════════════════════
+
+. di as text    " Analysis complete. Outputs saved to: $out"
+ Analysis complete. Outputs saved to: /Users/ericbooth/Documents/PVAMU_NSF_Workshop_2026/scrip
+> ts/221043-V2/output_2022
+
+. di as text    "══════════════════════════════════════════════════════════"
+══════════════════════════════════════════════════════════
+
+. di as text    " Datasets:  prams22_master.dta / .csv"
+ Datasets:  prams22_master.dta / .csv
+
+. di as text    " Figures:   fig1_dep_bar.png"
+ Figures:   fig1_dep_bar.png
+
+. di as text    "            fig2_dep_forest.png"
+            fig2_dep_forest.png
+
+. di as text    "            fig3_scatter_dep_ins.png"
+            fig3_scatter_dep_ins.png
+
+. di as text    "            fig4_matrix.png"
+            fig4_matrix.png
+
+. di as text    "            fig5_coefplot.png"
+            fig5_coefplot.png
+
+. di as text    "            fig6_fit_vs_obs.png"
+            fig6_fit_vs_obs.png
+
+. di as text    "            fig7_residuals.png"
+            fig7_residuals.png
+
+. di as text    " Log:       prams_2022_analysis.log"
+ Log:       prams_2022_analysis.log
+
+. di as text    "══════════════════════════════════════════════════════════"
+══════════════════════════════════════════════════════════
+
+. 
+. log close
+      name:  <unnamed>
+       log:  /Users/ericbooth/Documents/PVAMU_NSF_Workshop_2026/scripts/221043-V2/output_2022/
+> prams_2022_analysis.log
+  log type:  text
+ closed on:  15 May 2026, 18:47:19
+----------------------------------------------------------------------------------------------

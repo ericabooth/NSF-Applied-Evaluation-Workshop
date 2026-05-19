@@ -1,0 +1,741 @@
+----------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/ericbooth/Documents/PVAMU_NSF_Workshop_2026/scripts/edc-3.0-texas/performa
+> nce_analysis.log
+  log type:  text
+ opened on:  16 May 2026, 11:52:12
+
+. 
+. * 2. IMPORT AND APPEND DATA
+. tempfile master
+
+. save `master', emptyok replace
+(dataset contains 0 observations)
+(file /var/folders/5n/6s4drlks0734vkn04zv4l0tr0000gp/T//S_01242.000001 not found)
+file /var/folders/5n/6s4drlks0734vkn04zv4l0tr0000gp/T//S_01242.000001 saved as .dta format
+
+. 
+. local files : dir . files "edc-3.0-texas-*.csv"
+
+. 
+. foreach f in `files' {
+  2.     * Skip district/state specific files and redundant school files if using the main yea
+> r file
+.     * We will use the main year files (e.g., edc-3.0-texas-2022.csv) and filter for DataLeve
+> l=="School"
+.     if strpos("`f'", "-district") > 0 | strpos("`f'", "-state") > 0 | strpos("`f'", "-school
+> ") > 0 {
+  3.         continue
+  4.     }
+  5.     
+.     display "--- Importing `f' ---"
+  6.     import delimited using "`f'", clear varnames(1)
+  7.     
+.     * Standardize variable names to lowercase to avoid case-sensitivity issues
+.     rename *, lower
+  8.     
+.     * Clean up string variables for robust filtering
+.     foreach v in datalevel gradelevel studentsubgroup {
+  9.         capture confirm variable `v'
+ 10.         if _rc == 0 {
+ 11.             replace `v' = trim(itrim(`v'))
+ 12.         }
+ 13.     }
+ 14.     
+.     * Keep school level data only
+.     capture keep if lower(datalevel) == "school"
+ 15.     if _rc {
+ 16.         display as error "Warning: Could not filter by datalevel in `f'. Check variable n
+> ames."
+ 17.         describe
+ 18.         continue
+ 19.     }
+ 20.     
+.     * Focus on Grades 4 and 8 (using robust matching)
+.     capture keep if inlist(upper(gradelevel), "G04", "G08")
+ 21.     
+.     * Focus on All Students for consistency
+.     capture keep if lower(studentsubgroup) == "all students"
+ 22.     
+.     count
+ 23.     if r(N) == 0 {
+ 24.         display "Warning: No school-level G04/G08 'All Students' records found in `f'. Sk
+> ipping."
+ 25.         continue
+ 26.     }
+ 27.     
+.     * Select key variables (using lowercase)
+.     local keyvars "schyear datalevel stateassignedschid schname assmtname subject gradelevel
+>  studentsubgroup proficientorabove_percent"
+ 28.     foreach v in `keyvars' {
+ 29.         capture confirm variable `v'
+ 30.         if _rc {
+ 31.             display "Warning: Variable `v' not found in `f'. Creating empty placeholder."
+ 32.             gen `v' = ""
+ 33.         }
+ 34.     }
+ 35.     keep `keyvars'
+ 36.     
+.     * Append to master
+.     append using `master'
+ 37.     save `master', replace
+ 38. }
+--- Importing edc-3.0-texas-2019.csv ---
+(encoding automatically selected: ISO-8859-1)
+(49 vars, 1,239,566 obs)
+  (all newnames==oldnames)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+  22,683
+file /var/folders/5n/6s4drlks0734vkn04zv4l0tr0000gp/T//S_01242.000001 saved as .dta format
+--- Importing edc-3.0-texas-2025.csv ---
+(encoding automatically selected: ISO-8859-1)
+(49 vars, 1,311,335 obs)
+  (all newnames==oldnames)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+  23,137
+file /var/folders/5n/6s4drlks0734vkn04zv4l0tr0000gp/T//S_01242.000001 saved as .dta format
+--- Importing edc-3.0-texas-2024.csv ---
+(encoding automatically selected: ISO-8859-1)
+(49 vars, 1,295,021 obs)
+  (all newnames==oldnames)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+  23,291
+file /var/folders/5n/6s4drlks0734vkn04zv4l0tr0000gp/T//S_01242.000001 saved as .dta format
+--- Importing edc-3.0-texas-2018.csv ---
+(encoding automatically selected: ISO-8859-1)
+(49 vars, 1,233,524 obs)
+  (all newnames==oldnames)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+  22,392
+(variable schname was str15, now str50 to accommodate using data's values)
+file /var/folders/5n/6s4drlks0734vkn04zv4l0tr0000gp/T//S_01242.000001 saved as .dta format
+--- Importing edc-3.0-texas-2023.csv ---
+(encoding automatically selected: ISO-8859-1)
+(49 vars, 1,264,140 obs)
+  (all newnames==oldnames)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+  22,695
+file /var/folders/5n/6s4drlks0734vkn04zv4l0tr0000gp/T//S_01242.000001 saved as .dta format
+--- Importing edc-3.0-texas-2022.csv ---
+(encoding automatically selected: ISO-8859-1)
+(49 vars, 1,242,717 obs)
+  (all newnames==oldnames)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+  22,255
+file /var/folders/5n/6s4drlks0734vkn04zv4l0tr0000gp/T//S_01242.000001 saved as .dta format
+--- Importing edc-3.0-texas-2021.csv ---
+(encoding automatically selected: ISO-8859-1)
+(49 vars, 1,239,684 obs)
+  (all newnames==oldnames)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+  22,953
+(variable schname was str15, now str50 to accommodate using data's values)
+file /var/folders/5n/6s4drlks0734vkn04zv4l0tr0000gp/T//S_01242.000001 saved as .dta format
+--- Importing edc-3.0-texas-2013.csv ---
+(encoding automatically selected: ISO-8859-1)
+(49 vars, 1,175,758 obs)
+  (all newnames==oldnames)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+  21,382
+(variable schname was str15, now str50 to accommodate using data's values)
+file /var/folders/5n/6s4drlks0734vkn04zv4l0tr0000gp/T//S_01242.000001 saved as .dta format
+--- Importing edc-3.0-texas-2012.csv ---
+(encoding automatically selected: ISO-8859-1)
+(49 vars, 1,170,729 obs)
+  (all newnames==oldnames)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+  21,188
+(variable schname was str15, now str50 to accommodate using data's values)
+file /var/folders/5n/6s4drlks0734vkn04zv4l0tr0000gp/T//S_01242.000001 saved as .dta format
+--- Importing edc-3.0-texas-2016.csv ---
+(encoding automatically selected: ISO-8859-1)
+(49 vars, 1,199,462 obs)
+  (all newnames==oldnames)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+  21,851
+(variable schname was str18, now str50 to accommodate using data's values)
+file /var/folders/5n/6s4drlks0734vkn04zv4l0tr0000gp/T//S_01242.000001 saved as .dta format
+--- Importing edc-3.0-texas-2017.csv ---
+(encoding automatically selected: ISO-8859-1)
+(49 vars, 1,223,269 obs)
+  (all newnames==oldnames)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+  22,212
+(variable schname was str15, now str50 to accommodate using data's values)
+(variable proficientorabove_percent was str3, now str11 to accommodate using data's values)
+file /var/folders/5n/6s4drlks0734vkn04zv4l0tr0000gp/T//S_01242.000001 saved as .dta format
+--- Importing edc-3.0-texas-2015.csv ---
+(encoding automatically selected: ISO-8859-1)
+(49 vars, 1,184,591 obs)
+  (all newnames==oldnames)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+  21,714
+(variable schname was str15, now str50 to accommodate using data's values)
+(variable proficientorabove_percent was str3, now str11 to accommodate using data's values)
+file /var/folders/5n/6s4drlks0734vkn04zv4l0tr0000gp/T//S_01242.000001 saved as .dta format
+--- Importing edc-3.0-texas-2014.csv ---
+(encoding automatically selected: ISO-8859-1)
+(49 vars, 1,183,028 obs)
+  (all newnames==oldnames)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+  21,560
+(variable schname was str15, now str50 to accommodate using data's values)
+(variable proficientorabove_percent was str3, now str11 to accommodate using data's values)
+file /var/folders/5n/6s4drlks0734vkn04zv4l0tr0000gp/T//S_01242.000001 saved as .dta format
+
+. 
+. use `master', clear
+
+. count
+  289,313
+
+. if r(N) == 0 {
+.     display as error "ERROR: Master dataset is empty. Check your filters and raw data."
+.     exit 2000
+. }
+
+. 
+. * 3. DATA CLEANING AND LABELING
+. * Convert schyear (e.g., "2021-22") to numeric year (end year: 2022)
+. gen year_str = substr(schyear, -2, 2)
+
+. destring year_str, gen(year_short)
+year_str: all characters numeric; year_short generated as byte
+
+. gen year = 2000 + year_short
+
+. replace year = 1900 + year_short if year_short > 50 
+(0 real changes made)
+
+. label var year "School Year (Spring)"
+
+. 
+. * Clean proficiency variable (handle non-numeric like "--" or "*")
+. destring proficientorabove_percent, replace force
+proficientorabove_percent: contains nonnumeric characters; replaced as double
+(14275 missing values generated)
+
+. label var proficientorabove_percent "% Proficient or Above"
+
+. 
+. * Create STAAR Redesign Flag (Redesign implemented in Spring 2023)
+. gen redesign = (year >= 2023)
+
+. label define redesign_lbl 0 "Pre-Redesign (Before 2023)" 1 "Post-Redesign (2023+)"
+
+. label values redesign redesign_lbl
+
+. label var redesign "STAAR Test Redesign Period"
+
+. 
+. * Encode String variables to Numeric for regressions (Factor Variable Fix)
+. encode subject, gen(subject_n)
+
+. encode gradelevel, gen(gradelevel_n)
+
+. label var subject_n "Subject (numeric)"
+
+. label var gradelevel_n "Grade Level (numeric)"
+
+. 
+. * Filter for core subjects only (Reading/ELA and Math)
+. keep if inlist(lower(subject), "ela", "math")
+(98,293 observations deleted)
+
+. 
+. * Clean school ID
+. destring stateassignedschid, replace force
+stateassignedschid already numeric; no replace
+
+. 
+. * HANDLE DUPLICATES (e.g., English vs Spanish assessments)
+. * Focus on English assessments to avoid duplicated school-grade-subject records
+. keep if lower(assmtname) == "staar - english"
+(15,316 observations deleted)
+
+. 
+. * Collapse to ensure exactly one observation per School-Grade-Subject-Year
+. * (This is the definitive fix for the 'repeated time values' error)
+. collapse (mean) proficientorabove_percent, by(stateassignedschid schname year redesign subje
+> ct subject_n gradelevel gradelevel_n)
+
+. 
+. * Create a unique Panel ID for School-Grade-Subject cohorts
+. egen panel_id = group(stateassignedschid gradelevel_n subject_n)
+
+. label var panel_id "Panel ID (School-Grade-Subject Cohort)"
+
+. 
+. * SAVE ANALYTIC DATASET
+. save "analytic_performance.dta", replace
+file analytic_performance.dta saved
+
+. display "Analytic dataset saved: analytic_performance.dta"
+Analytic dataset saved: analytic_performance.dta
+
+. 
+. * 4. RESEARCH QUESTION
+. /* 
+> RESEARCH QUESTION: 
+> How did school-level proficiency rates in Grades 4 and 8 shift following the 
+> implementation of the redesigned STAAR test in Spring 2023, and did these 
+> effects differ between Reading (ELA) and Math?
+> */
+. u  "analytic_performance.dta", clear
+
+. 
+. 
+. * 5. SUMMARY STATISTICS (By Subject)
+. foreach sub in "ela" "math" {
+  2.     display "****************************************************************"
+  3.     display "SUMMARY STATISTICS: `sub'"
+  4.     display "****************************************************************"
+  5.     tabstat proficientorabove_percent if subject == "`sub'", by(redesign) s(mean sd n) fo
+> rmat(%9.2f)
+  6.     table (gradelevel) (redesign) if subject == "`sub'", statistic(mean proficientorabove
+> _percent) nformat(%9.2f)
+  7. }
+****************************************************************
+SUMMARY STATISTICS: ela
+****************************************************************
+
+Summary for variables: proficientorabove_percent
+Group variable: redesign (STAAR Test Redesign Period)
+
+        redesign |      Mean        SD         N
+-----------------+------------------------------
+Pre-Redesign (Be |      0.59      0.23  65208.00
+Post-Redesign (2 |      0.50      0.19  21042.00
+-----------------+------------------------------
+           Total |      0.57      0.23  86250.00
+------------------------------------------------
+
+------------------------------------------------------------------------
+           |                  STAAR Test Redesign Period                
+           |  Pre-Redesign (Before 2023)   Post-Redesign (2023+)   Total
+-----------+------------------------------------------------------------
+GradeLevel |                                                            
+  G04      |                        0.57                    0.48    0.55
+  G08      |                        0.64                    0.54    0.61
+  Total    |                        0.59                    0.50    0.57
+------------------------------------------------------------------------
+****************************************************************
+SUMMARY STATISTICS: math
+****************************************************************
+
+Summary for variables: proficientorabove_percent
+Group variable: redesign (STAAR Test Redesign Period)
+
+        redesign |      Mean        SD         N
+-----------------+------------------------------
+Pre-Redesign (Be |      0.55      0.24  64746.00
+Post-Redesign (2 |      0.43      0.20  20689.00
+-----------------+------------------------------
+           Total |      0.52      0.24  85435.00
+------------------------------------------------
+
+------------------------------------------------------------------------
+           |                  STAAR Test Redesign Period                
+           |  Pre-Redesign (Before 2023)   Post-Redesign (2023+)   Total
+-----------+------------------------------------------------------------
+GradeLevel |                                                            
+  G04      |                        0.55                    0.44    0.52
+  G08      |                        0.57                    0.41    0.53
+  Total    |                        0.55                    0.43    0.52
+------------------------------------------------------------------------
+
+. 
+. * 6. VISUALIZATION (By Subject)
+. foreach sub in "ela" "math" {
+  2.     preserve
+  3.         keep if subject == "`sub'"
+  4.         collapse (mean) avg_prof = proficientorabove_percent, by(year gradelevel)
+  5.         twoway (connected avg_prof year if gradelevel=="G04", lcolor(blue) mcolor(blue)) 
+> ///
+>                (connected avg_prof year if gradelevel=="G08", lcolor(red) mcolor(red)), ///
+>                xline(2022.5, lpattern(dash) lcolor(black)) ///
+>                title("Mean Proficiency: `sub' (2012-2025)") ///
+>                subtitle("Dashed line indicates 2023 STAAR Redesign") ///
+>                legend(order(1 "Grade 4" 2 "Grade 8")) ///
+>                xlabel(2012(2)2025) ylabel(0(.1)1) ///
+>                xtitle("School Year") ytitle("Mean % Proficient or Above")
+  6.         graph export "trends_`sub'.png", replace
+  7.     restore
+  8. }
+(87,639 observations deleted)
+file /Users/ericbooth/Documents/PVAMU_NSF_Workshop_2026/scripts/edc-3.0-texas/trends_ela.png
+    saved as PNG format
+(88,065 observations deleted)
+file
+    /Users/ericbooth/Documents/PVAMU_NSF_Workshop_2026/scripts/edc-3.0-texas/trends_math.png
+    saved as PNG format
+
+. 
+. * 7. REGRESSION ANALYSIS (Subject-Specific)
+. foreach sub in "ela" "math" {
+  2.     display "****************************************************************"
+  3.     display "REGRESSION ANALYSIS: `sub' (2021-2024)"
+  4.     display "****************************************************************"
+  5.     
+.     * OLS with Grade controls
+.     display "OLS Model: `sub'"
+  6.     reg proficientorabove_percent redesign i.gradelevel_n if subject == "`sub'" & inrange
+> (year, 2021, 2024), vce(cluster stateassignedschid)
+  7.     
+.     * School-Grade Fixed Effects: Within-cohort change
+.     * We use panel_id instead of school ID to avoid 'repeated time values' 
+.     xtset panel_id year
+  8.     display "Fixed Effects Model: `sub'"
+  9.     xtreg proficientorabove_percent redesign if subject == "`sub'" & inrange(year, 2021, 
+> 2024), fe vce(cluster stateassignedschid)
+ 10. }
+****************************************************************
+REGRESSION ANALYSIS: ela (2021-2024)
+****************************************************************
+OLS Model: ela
+
+Linear regression                               Number of obs     =     27,653
+                                                F(2, 6803)        =     561.99
+                                                Prob > F          =     0.0000
+                                                R-squared         =     0.0394
+                                                Root MSE          =     .18921
+
+                 (Std. err. adjusted for 6,804 clusters in stateassignedschid)
+------------------------------------------------------------------------------
+             |               Robust
+proficient~t | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+    redesign |   .0385558   .0013233    29.14   0.000     .0359618    .0411498
+             |
+gradelevel_n |
+        G08  |   .0702765   .0038866    18.08   0.000     .0626574    .0778955
+       _cons |   .4259426   .0023453   181.61   0.000      .421345    .4305401
+------------------------------------------------------------------------------
+
+Panel variable: panel_id (unbalanced)
+ Time variable: year, 2012 to 2025, but with gaps
+         Delta: 1 unit
+Fixed Effects Model: ela
+
+Fixed-effects (within) regression               Number of obs     =     27,653
+Group variable: panel_id                        Number of groups  =      7,349
+
+R-squared:                                      Obs per group:
+     Within  = 0.0345                                         min =          1
+     Between = 0.0073                                         avg =        3.8
+     Overall = 0.0101                                         max =          4
+
+                                                F(1, 6803)        =     900.69
+corr(u_i, Xb) = 0.0068                          Prob > F          =     0.0000
+
+                 (Std. err. adjusted for 6,804 clusters in stateassignedschid)
+------------------------------------------------------------------------------
+             |               Robust
+proficient~t | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+    redesign |   .0365731   .0012186    30.01   0.000     .0341842    .0389621
+       _cons |   .4501058    .000617   729.55   0.000     .4488964    .4513153
+-------------+----------------------------------------------------------------
+     sigma_u |  .17082608
+     sigma_e |  .11107547
+         rho |  .70284282   (fraction of variance due to u_i)
+------------------------------------------------------------------------------
+****************************************************************
+REGRESSION ANALYSIS: math (2021-2024)
+****************************************************************
+OLS Model: math
+
+Linear regression                               Number of obs     =     27,263
+                                                F(2, 6727)        =     911.42
+                                                Prob > F          =     0.0000
+                                                R-squared         =     0.0291
+                                                Root MSE          =     .20359
+
+                 (Std. err. adjusted for 6,728 clusters in stateassignedschid)
+------------------------------------------------------------------------------
+             |               Robust
+proficient~t | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+    redesign |   .0687387   .0016166    42.52   0.000     .0655697    .0719077
+             |
+gradelevel_n |
+        G08  |   -.017063   .0046124    -3.70   0.000    -.0261048   -.0080212
+       _cons |   .3601263   .0026013   138.44   0.000     .3550269    .3652258
+------------------------------------------------------------------------------
+
+Panel variable: panel_id (unbalanced)
+ Time variable: year, 2012 to 2025, but with gaps
+         Delta: 1 unit
+Fixed Effects Model: math
+
+Fixed-effects (within) regression               Number of obs     =     27,263
+Group variable: panel_id                        Number of groups  =      7,267
+
+R-squared:                                      Obs per group:
+     Within  = 0.1174                                         min =          1
+     Between = 0.0013                                         avg =        3.8
+     Overall = 0.0277                                         max =          4
+
+                                                F(1, 6727)        =    2145.89
+corr(u_i, Xb) = -0.0012                         Prob > F          =     0.0000
+
+                 (Std. err. adjusted for 6,728 clusters in stateassignedschid)
+------------------------------------------------------------------------------
+             |               Robust
+proficient~t | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+    redesign |   .0691678   .0014931    46.32   0.000     .0662408    .0720948
+       _cons |   .3544514   .0007541   470.03   0.000     .3529731    .3559297
+-------------+----------------------------------------------------------------
+     sigma_u |  .18617332
+     sigma_e |  .10885797
+         rho |  .74521793   (fraction of variance due to u_i)
+------------------------------------------------------------------------------
+
+. 
+. display "Note: The coefficient on 'redesign' represents the average percentage point shift"
+Note: The coefficient on 'redesign' represents the average percentage point shift
+
+. display "in proficiency rates associated with the 2023 STAAR redesign period."
+in proficiency rates associated with the 2023 STAAR redesign period.
+
+. 
+. display "Analysis Complete."
+Analysis Complete.
+
+. 
+. * 8. SENSITIVITY ANALYSIS: CLEAN BASELINE (2018-2025 ONLY)
+. /* 
+> This section replicates the analysis but restricts the data to 2018 onwards.
+> This excludes the 2016 technical glitches and older policy regimes, 
+> providing a more contemporary 'normal' baseline for the redesign comparison.
+> */
+. 
+. display "****************************************************************"
+****************************************************************
+
+. display "SENSITIVITY ANALYSIS: DATA FROM 2018-2025"
+SENSITIVITY ANALYSIS: DATA FROM 2018-2025
+
+. display "****************************************************************"
+****************************************************************
+
+. 
+. 
+.     foreach sub in "ela" "math" {
+  2. preserve
+  3.     keep if year >= 2018
+  4.             display "--- Summary Stats (2018+): `sub' ---"
+  5.         tabstat proficientorabove_percent if subject == "`sub'", by(redesign) s(mean sd n
+> ) format(%9.2f)
+  6.         
+.         * New Trends Graph (2018+)
+.         collapse (mean) avg_prof = proficientorabove_percent, by(year gradelevel subject)
+  7.         twoway (connected avg_prof year if gradelevel=="G04" & subject=="`sub'", lcolor(b
+> lue) mcolor(blue)) ///
+>                (connected avg_prof year if gradelevel=="G08" & subject=="`sub'", lcolor(red)
+>  mcolor(red)), ///
+>                xline(2023, lpattern(dash) lcolor(black)) ///
+>                title("Proficiency Trends (2018-2025): `sub'") ///
+>                subtitle("Cleaned Baseline Analysis") ///
+>                legend(order(1 "Grade 4" 2 "Grade 8")) ///
+>                xlabel(2018(1)2025) ylabel(0(.1).8) ///
+>                xtitle("School Year") ytitle("Mean % Proficient or Above") name(`sub', replac
+> e)
+  8.         graph export "trends_`sub'_2018plus.png", replace
+  9.         
+.         * Restore for the next subject loop
+.         restore
+ 10.     }
+(77,990 observations deleted)
+--- Summary Stats (2018+): ela ---
+
+Summary for variables: proficientorabove_percent
+Group variable: redesign (STAAR Test Redesign Period)
+
+        redesign |      Mean        SD         N
+-----------------+------------------------------
+Pre-Redesign (Be |      0.44      0.18  26941.00
+Post-Redesign (2 |      0.50      0.19  21042.00
+-----------------+------------------------------
+           Total |      0.47      0.19  47983.00
+------------------------------------------------
+file
+    /Users/ericbooth/Documents/PVAMU_NSF_Workshop_2026/scripts/edc-3.0-texas/trends_ela_2018
+    > plus.png saved as PNG format
+(77,990 observations deleted)
+--- Summary Stats (2018+): math ---
+
+Summary for variables: proficientorabove_percent
+Group variable: redesign (STAAR Test Redesign Period)
+
+        redesign |      Mean        SD         N
+-----------------+------------------------------
+Pre-Redesign (Be |      0.41      0.21  26675.00
+Post-Redesign (2 |      0.43      0.20  20689.00
+-----------------+------------------------------
+           Total |      0.42      0.20  47364.00
+------------------------------------------------
+file
+    /Users/ericbooth/Documents/PVAMU_NSF_Workshop_2026/scripts/edc-3.0-texas/trends_math_201
+    > 8plus.png saved as PNG format
+
+. 
+.     * Regression Analysis (2018-2024)
+.     * This compares the 2018-2019 (pre-pandemic) and 2021-2022 (recovery) 
+.     * to the 2023-2024 (redesign) period.
+.     foreach sub in "ela" "math" {
+  2.  preserve
+  3.     keep if year >= 2018
+  4.         display "--- Regression (2018-2024 Baseline): `sub' ---"
+  5.         
+.         display "OLS Model (2018+): `sub'"
+  6.         reg proficientorabove_percent redesign i.gradelevel_n if subject == "`sub'" & inr
+> ange(year, 2018, 2024), vce(cluster stateassignedschid)
+  7.         
+.         xtset panel_id year
+  8.         display "Fixed Effects Model (2018+): `sub'"
+  9.         xtreg proficientorabove_percent redesign if subject == "`sub'" & inrange(year, 20
+> 18, 2024), fe vce(cluster stateassignedschid)
+ 10. restore
+ 11. 
+.     }
+(77,990 observations deleted)
+--- Regression (2018-2024 Baseline): ela ---
+OLS Model (2018+): ela
+
+Linear regression                               Number of obs     =     40,941
+                                                F(2, 7015)        =     694.57
+                                                Prob > F          =     0.0000
+                                                R-squared         =     0.0372
+                                                Root MSE          =     .18394
+
+                 (Std. err. adjusted for 7,016 clusters in stateassignedschid)
+------------------------------------------------------------------------------
+             |               Robust
+proficient~t | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+    redesign |   .0434047   .0012964    33.48   0.000     .0408633    .0459461
+             |
+gradelevel_n |
+        G08  |   .0630375   .0037394    16.86   0.000     .0557073    .0703678
+       _cons |   .4234939   .0022096   191.66   0.000     .4191625    .4278253
+------------------------------------------------------------------------------
+
+Panel variable: panel_id (unbalanced)
+ Time variable: year, 2018 to 2025, but with gaps
+         Delta: 1 unit
+Fixed Effects Model (2018+): ela
+
+Fixed-effects (within) regression               Number of obs     =     40,941
+Group variable: panel_id                        Number of groups  =      7,589
+
+R-squared:                                      Obs per group:
+     Within  = 0.0347                                         min =          1
+     Between = 0.0161                                         avg =        5.4
+     Overall = 0.0123                                         max =          6
+
+                                                F(1, 7015)        =    1138.72
+corr(u_i, Xb) = 0.0145                          Prob > F          =     0.0000
+
+                 (Std. err. adjusted for 7,016 clusters in stateassignedschid)
+------------------------------------------------------------------------------
+             |               Robust
+proficient~t | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+    redesign |   .0388688   .0011518    33.74   0.000     .0366108    .0411267
+       _cons |   .4457018   .0003939  1131.57   0.000     .4449297    .4464739
+-------------+----------------------------------------------------------------
+     sigma_u |  .16618408
+     sigma_e |  .10527932
+         rho |  .71360512   (fraction of variance due to u_i)
+------------------------------------------------------------------------------
+(77,990 observations deleted)
+--- Regression (2018-2024 Baseline): math ---
+OLS Model (2018+): math
+
+Linear regression                               Number of obs     =     40,444
+                                                F(2, 6938)        =      61.25
+                                                Prob > F          =     0.0000
+                                                R-squared         =     0.0016
+                                                Root MSE          =     .20525
+
+                 (Std. err. adjusted for 6,939 clusters in stateassignedschid)
+------------------------------------------------------------------------------
+             |               Robust
+proficient~t | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+    redesign |   .0172361   .0015581    11.06   0.000     .0141818    .0202904
+             |
+gradelevel_n |
+        G08  |  -.0024678   .0043267    -0.57   0.568    -.0109494    .0060138
+       _cons |   .4069522   .0023419   173.77   0.000     .4023614     .411543
+------------------------------------------------------------------------------
+
+Panel variable: panel_id (unbalanced)
+ Time variable: year, 2018 to 2025, but with gaps
+         Delta: 1 unit
+Fixed Effects Model (2018+): math
+
+Fixed-effects (within) regression               Number of obs     =     40,444
+Group variable: panel_id                        Number of groups  =      7,508
+
+R-squared:                                      Obs per group:
+     Within  = 0.0052                                         min =          1
+     Between = 0.0001                                         avg =        5.4
+     Overall = 0.0016                                         max =          6
+
+                                                F(1, 6938)        =     154.29
+corr(u_i, Xb) = -0.0011                         Prob > F          =     0.0000
+
+                 (Std. err. adjusted for 6,939 clusters in stateassignedschid)
+------------------------------------------------------------------------------
+             |               Robust
+proficient~t | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+    redesign |   .0176251   .0014189    12.42   0.000     .0148436    .0204067
+       _cons |   .4060315   .0004831   840.51   0.000     .4050846    .4069785
+-------------+----------------------------------------------------------------
+     sigma_u |  .17953477
+     sigma_e |  .12522912
+         rho |   .6727056   (fraction of variance due to u_i)
+------------------------------------------------------------------------------
+
+. 
+. 
+. display "Sensitivity Analysis Complete."
+Sensitivity Analysis Complete.
+
+. log close
+      name:  <unnamed>
+       log:  /Users/ericbooth/Documents/PVAMU_NSF_Workshop_2026/scripts/edc-3.0-texas/performa
+> nce_analysis.log
+  log type:  text
+ closed on:  16 May 2026, 11:57:04
+----------------------------------------------------------------------------------------------
