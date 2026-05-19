@@ -16,7 +16,7 @@ Due to licensing and size constraints, the raw datasets are **not** included in 
 - **ICPSR (Inter-university Consortium for Political and Social Research):** Used for the PRAMS (Pregnancy Risk Assessment and Monitoring System) analysis. Look for the dataset ID mentioned in the slides for Examples 1 and 2. 
     - *** Medicaid expansion data: https://www.openicpsr.org/openicpsr/project/114516/version/V1/view?path=/openicpsr/114516/fcr:versions/V1 
     - *** PRAMS data: https://www.openicpsr.org/openicpsr/project/221043/version/V1/view;jsessionid=0851564D4EC837B60874212A234350E7
-- **Zelma.ai:** Used for the education performance data and NAEP/STAAR comparisons (Example 3)
+- **Zelma.ai:** Used for the education performance data and NAEP/STAAR comparisons (Example 3)  https://www.zelma.ai/data
 
 Please ensure you save these datasets in the `scripts/` directory or update the file paths in the Stata do-files accordingly.
 
