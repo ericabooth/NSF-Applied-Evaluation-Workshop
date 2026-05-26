@@ -42,3 +42,18 @@ In the `scripts/` folder, you will find `medicaidsummary.html`. This is a **Spar
 
 ## ❓ Need Help?
 If you run into issues with data paths or Stata commands, refer back to the slides or reach out during the Q&A session. Happy coding!
+
+
+
+### 📫 Connect with Me
+
+- 🌐 **Website:** [www.eric-booth.com](https://sites.google.com/site/ericabooth/cv/mycv)
+- 💼 **LinkedIn:** [Eric A. Booth](https://www.linkedin.com/in/eric-booth-746376a)
+- 📧 **Email:** [eric.a.booth@gmail.com](mailto:eric.a.booth@gmail.com)
+
+- 
+
+# Recent Github Sites examples for Stata packages include:
+- [Webdoc2 for Stata](https://ericabooth.github.io/Webdoc2_Example_Site/) (interactive websites generated from Stata do-files)
+- [StataShiny](https://ericabooth.github.io/StataShiny_Example_Site/) (RShiny-like package for simulations, interactive viz, and web tables for Stata)
+- 
